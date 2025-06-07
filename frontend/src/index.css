@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+#root{
+  font-family: "Inter",sans-serif;
+  font-optical-sizing: auto;
+  font-size: normal;
+}
+
+
+@theme{
+  --color-rabbit-red:#ea2e0e;
+}
