@@ -62,7 +62,10 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link to="/login" className="hover:text-black" aria-label="Login">
+          <Link to="/admin" className="block bg-black px-3 py-0.5 rounded text-sm text-white hover:bg-gray-800">
+            Admin
+          </Link>
+          <Link to="/profile" className="hover:text-black" aria-label="Login">
             <HiOutlineUser className="h-6 w-6 text-gray-700" />
           </Link>
 

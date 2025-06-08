@@ -12,12 +12,19 @@ import Checkout from "./components/Cart/Checkout";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
+import UserManagement from "./components/Admin/UserManagement";
+import ProductManagement from "./components/Admin/ProductManagement";
+
+// ✅ Admin Components
+import AdminLayout from "./components/Admin/AdminLayout"; 
+import AdminHomePage from "./pages/AdminHomePage"; 
 
 const App = () => {
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
+        {/* USER ROUTES */}
         <Route path="/" element={<UserLayout />}>
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
@@ -26,12 +33,20 @@ const App = () => {
           <Route path="collections/:collection" element={<CollectionPage />} />
           <Route path="product/:id" element={<ProductDetails />} />
           <Route path="checkout" element={<Checkout />} />
-          <Route
-            path="/order-confirmation"
-            element={<OrderConfirmationPage />}
-          />
+          <Route path="order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="order/:id" element={<OrderDetailsPage />} />
           <Route path="my-orders" element={<MyOrdersPage />} />
+        </Route>
+
+        {/* ✅ ADMIN ROUTES */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminHomePage />} />
+          <Route path="users"  element={<UserManagement />} />
+          <Route path="products"  element={<ProductManagement />} />
+          {/* You can add more like this:
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="products" element={<AdminProducts />} />
+          */}
         </Route>
       </Routes>
     </BrowserRouter>
