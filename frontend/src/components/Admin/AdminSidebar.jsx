@@ -67,7 +67,7 @@ const AdminSidebar = () => {
           <span>Products</span>
         </NavLink>
 
-        {/* ✅ Orders Link */}
+        {/* Orders Link */}
         <NavLink
           to="/admin/orders"
           className={({ isActive }) =>
@@ -80,7 +80,7 @@ const AdminSidebar = () => {
           <span>Orders</span>
         </NavLink>
 
-        {/* ✅ Shop Link */}
+        {/* Shop Link */}
         <NavLink
           to="/admin/shop"
           className={({ isActive }) =>

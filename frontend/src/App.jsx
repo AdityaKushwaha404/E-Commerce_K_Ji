@@ -14,6 +14,8 @@ import OrderDetailsPage from "./pages/OrderDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import UserManagement from "./components/Admin/UserManagement";
 import ProductManagement from "./components/Admin/ProductManagement";
+import EditProductPage from "./components/Admin/EditProductPage";
+import OrderManagement from "./components/Admin/OrderManagement";
 
 // ✅ Admin Components
 import AdminLayout from "./components/Admin/AdminLayout"; 
@@ -43,6 +45,9 @@ const App = () => {
           <Route index element={<AdminHomePage />} />
           <Route path="users"  element={<UserManagement />} />
           <Route path="products"  element={<ProductManagement />} />
+          <Route path="products/:id/edit" element={<EditProductPage />} />
+          <Route path="orders" element={<OrderManagement/>} />
+
           {/* You can add more like this:
           <Route path="users" element={<AdminUsers />} />
           <Route path="products" element={<AdminProducts />} />
