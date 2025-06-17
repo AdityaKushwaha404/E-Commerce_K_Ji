@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const checkoutRoutes = require("./routes/checkoutRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 
 const app = express();
@@ -20,6 +21,7 @@ connectDB();
 app.use("/api/users", userRoutes); // This is the missing line!
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/checkout", checkoutRoutes);
 // ✅ Add a simple route for testing
 
 app.get("/", (req, res) => {
