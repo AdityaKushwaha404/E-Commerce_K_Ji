@@ -19,11 +19,12 @@ const CheckoutItemSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true
-    }
-    // You can uncomment and use these if needed:
-    // size: { type: String },
-    // color: { type: String },
-    // quantity: { type: Number, required: true }
+    },
+    quantity: {
+      type: Number,
+      required: true
+    } // <-- Add this line
+    // Add other fields if needed (size, color, etc.)
   },
   { _id: false } // ✅ This disables _id for items in the array
 );
@@ -62,12 +63,10 @@ const CheckoutSchema = new mongoose.Schema(
       type: Date
     },
     paymentStatus: {
-      type: String,
-      enum: ['pending', 'paid', 'failed'],
-      default: 'pending'
+      type: String
     },
     paymentDetails: {
-      type: mongoose.Schema.Types.Mixed
+      type: Object
     },
     isFinalized: {
       type: Boolean,
