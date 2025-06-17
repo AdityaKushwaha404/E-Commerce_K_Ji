@@ -7,6 +7,8 @@ const productRoutes = require("./routes/productRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
+const subscriberRoutes = require("./routes/subscriberRoutes");
 
 const app = express();
 dotenv.config();
@@ -24,6 +26,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/subscriber", subscriberRoutes);
 // ✅ Add a simple route for testing
 
 app.get("/", (req, res) => {
