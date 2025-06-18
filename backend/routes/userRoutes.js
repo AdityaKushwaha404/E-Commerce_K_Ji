@@ -7,7 +7,7 @@ const router = express.Router();
 
 // ✅ Register Route
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password , role} = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -15,7 +15,7 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const newUser = new User({ name, email, password });
+    const newUser = new User({ name, email, password ,role});
     await newUser.save();
 
     const token = jwt.sign(
