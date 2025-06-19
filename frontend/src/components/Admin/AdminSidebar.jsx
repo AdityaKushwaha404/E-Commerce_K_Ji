@@ -82,7 +82,7 @@ const AdminSidebar = () => {
 
         {/* Shop Link */}
         <NavLink
-          to="/admin/shop"
+          to="/collections/all"
           className={({ isActive }) =>
             isActive
               ? "bg-gray-700 text-white py-3 px-4 rounded flex items-center space-x-2"

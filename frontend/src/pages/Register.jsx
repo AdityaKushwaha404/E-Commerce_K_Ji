@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import register from "../assets/register.webp"; // adjust if needed
+import {registerUser} from "../redux/slices/authSlice"; // Import your register action if needed
+import {useDispatch} from "react-redux"; // Import useDispatch if you want to dispatch
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch(); // Uncomment if you want to use Redux for registration
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    dispatch(registerUser({ name, email, password })); // Dispatch register action if using Redux
+    
     // Login logic here
     console.log({ name ,email, password });
   };

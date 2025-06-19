@@ -1,17 +1,29 @@
-import {configureStore} from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice'; // replace with your actual reducer
+import productReducer from "./slices/productsSlice"
+import cartReducer from "./slices/cartSlice"
+import checkoutReducer from "./slices/checkoutSlice"
+import orderReducer from "./slices/orderSlice"
+import adminReducer from "./slices/adminSlice"
+import adminProductReducer from "./slices/adminProductSlice"
+import adminOrderReducer from "./slices/adminOrderSlice"
 
 const store = configureStore({
   reducer: {
-    // Add your reducers here
-    // For example, if you have a user slice:
-    // user: userReducer,
-  },
+    auth: authReducer,
+    products:productReducer,
+    cart: cartReducer,
+    checkout: checkoutReducer,
+    order: orderReducer,
+    admin: adminReducer,
+    adminProducts : adminProductReducer,
+    adminOrders: adminOrderReducer,
+    
 
 
 
 
+  }
+});
 
-  export default store;
-
-
-  
+export default store;

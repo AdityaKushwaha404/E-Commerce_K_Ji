@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import login from "../assets/login.webp"; // adjust if needed
+import {loginUser} from "../redux/slices/authSlice"; // Import your login action if needed
+import { useDispatch } from "react-redux"; // Import useDispatch if you want to dispatch
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch(); // Uncomment if you want to use Redux for login
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    dispatch(loginUser({ email, password })); // Dispatch login action if using Redux
     // Login logic here
     console.log({ email, password });
+    console.log("🚀 Backend URL:", import.meta.env.VITE_BACKEND_URL);
+
   };
 
   return (

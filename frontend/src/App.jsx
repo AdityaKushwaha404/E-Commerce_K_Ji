@@ -21,6 +21,12 @@ import OrderManagement from "./components/Admin/OrderManagement";
 import AdminLayout from "./components/Admin/AdminLayout"; 
 import AdminHomePage from "./pages/AdminHomePage"; 
 
+
+
+
+import {Provider} from "react-redux";
+import store from "./redux/store";
+
 const App = () => {
   return (
     <BrowserRouter>
