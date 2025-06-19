@@ -64,7 +64,7 @@ const newArrivals = [
     images: [{ url: "https://picsum.photos/500/500?random=10", altText: "Comfy Hoodie" }],
   },
 ];
-
+// now goint to connect frontend with backend
 const NewArrivals = () => {
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
