@@ -30,7 +30,7 @@ import store from "./redux/store";
 const App = () => {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="top-right"  richColors />
       <Routes>
         {/* USER ROUTES */}
         <Route path="/" element={<UserLayout />}>

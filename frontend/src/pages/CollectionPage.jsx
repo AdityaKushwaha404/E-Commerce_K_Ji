@@ -3,11 +3,33 @@ import { FaFilter } from "react-icons/fa";
 import FilterSidebar from "../components/Products/FilterSidebar";
 import ProductGrid from "../components/Products/ProductGrid";
 import SortOptions from "../components/Products/SortOptions"; // Make sure this exists
+import {useParams} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { fetchProductByFilters } from "../redux/slices/productsSlice";
+
+
+
+
 
 const CollectionPage = () => {
-  const [products, setProducts] = useState([]);
+
+  const { collection } = useParams();
+  const [searchParams]= useSearchParams();
+  const dispatch = useDispatch();
+  const {products,loading, error} = useSelector((state)=> state.products)
+  const queryParams = Object.fromEntries([...searchParams])
+
+  // const [products, setProducts] = useState([]);
   const sidebarRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+
+  useEffect(()=>{
+    dispatch(fetchProductByFilters({
+      collection,...queryParams
+    }))
+  },[dispatch, collection, searchParams])
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -31,111 +53,7 @@ const CollectionPage = () => {
     };
   }, [isSidebarOpen]);
 
-  // Dummy products fetch
-  useEffect(() => {
-    setTimeout(() => {
-      const fetchedProducts = [
-  {
-    name: "Urban Zip Jacket",
-    price: 75,
-    originalPrice: 90,
-    brand: "MetroStyle",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=12",
-        altText: "Urban Zip Jacket 1",
-      },
-    ],
-  },
-  {
-    name: "Casual Cotton Hoodie",
-    price: 55,
-    originalPrice: 70,
-    brand: "DailyWear",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=13",
-        altText: "Casual Cotton Hoodie 1",
-      },
-    ],
-  },
-  {
-    name: "Slim Fit Blazer",
-    price: 110,
-    originalPrice: 145,
-    brand: "EliteThreads",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=14",
-        altText: "Slim Fit Blazer 1",
-      },
-    ],
-  },
-  {
-    name: "Rainproof Shell Jacket",
-    price: 85,
-    originalPrice: 100,
-    brand: "OutdoorX",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=15",
-        altText: "Rainproof Shell Jacket 1",
-      },
-    ],
-  },
-  {
-    name: "Quilted Bomber Jacket",
-    price: 120,
-    originalPrice: 150,
-    brand: "Skyline",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=16",
-        altText: "Quilted Bomber Jacket 1",
-      },
-    ],
-  },
-  {
-    name: "Retro Varsity Jacket",
-    price: 100,
-    originalPrice: 130,
-    brand: "OldSchool",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=17",
-        altText: "Retro Varsity Jacket 1",
-      },
-    ],
-  },
-  {
-    name: "Softshell Track Jacket",
-    price: 90,
-    originalPrice: 110,
-    brand: "SpeedWear",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=18",
-        altText: "Softshell Track Jacket 1",
-      },
-    ],
-  },
-  {
-    name: "Eco-Friendly Zip-Up",
-    price: 60,
-    originalPrice: 75,
-    brand: "GreenFit",
-    images: [
-      {
-        url: "https://picsum.photos/500/500?random=19",
-        altText: "Eco-Friendly Zip-Up 1",
-      },
-    ],
-  }
-]
 
-      setProducts(fetchedProducts);
-    }, 1000);
-  }, []);
 
   return (
     <div className="flex flex-col lg:flex-row relative min-h-screen bg-gray-50">
@@ -175,7 +93,8 @@ const CollectionPage = () => {
           <SortOptions />
         </div>
 
-        <ProductGrid products={products} />
+        <ProductGrid products={products}  loading=
+        {loading} error={error} />
       </div>
     </div>
   );

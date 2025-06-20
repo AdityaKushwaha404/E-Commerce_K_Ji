@@ -1,23 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/axios';
 
-// Async Thunk to Fetch Products by collection and optional filters
+// Async Thunk to Fetch Products by filters
 export const fetchProductByFilters = createAsyncThunk(
   'products/fetchByFilters',
-  async ({
-    collection,
-    size,
-    color,
-    gender,
-    minPrice,
-    maxPrice,
-    sortBy,
-    search,
-    category,
-    material,
-    brand,
-    limit
-  }, thunkAPI) => {
+  async (
+    {
+      collection,
+      size,
+      color,
+      gender,
+      minPrice,
+      maxPrice,
+      sortBy,
+      search,
+      category,
+      material,
+      brand,
+      limit
+    },
+    thunkAPI
+  ) => {
     try {
       const query = new URLSearchParams();
 
@@ -34,7 +37,7 @@ export const fetchProductByFilters = createAsyncThunk(
       if (brand) query.append('brand', brand);
       if (limit) query.append('limit', limit);
 
-      const response = await api.get(`/products?${query.toString()}`);
+      const response = await api.get(`/api/products?${query.toString()}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Something went wrong');
@@ -47,7 +50,7 @@ export const fetchProductDetails = createAsyncThunk(
   'products/fetchProductDetails',
   async (productId, thunkAPI) => {
     try {
-      const response = await api.get(`/products/${productId}`);
+      const response = await api.get(`/api/products/${productId}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Failed to fetch product');
@@ -61,15 +64,11 @@ export const updateProduct = createAsyncThunk(
   async ({ productId, productData }, thunkAPI) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.put(
-        `/products/${productId}`,
-        productData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.put(`/api/products/${productId}`, productData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Failed to update product');
@@ -82,10 +81,23 @@ export const fetchSimilarProducts = createAsyncThunk(
   'products/fetchSimilarProducts',
   async ({ productId }, thunkAPI) => {
     try {
-      const response = await api.get(`/products/similar/${productId}`);
+      const response = await api.get(`/api/products/similar/${productId}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Failed to fetch similar products');
+    }
+  }
+);
+
+// ✅ Async Thunk to fetch the best seller product
+export const fetchBestSellerProduct = createAsyncThunk(
+  'products/fetchBestSellerProduct',
+  async (_, thunkAPI) => {
+    try {
+      const response = await api.get('/api/products/best-seller'); // Assumes '/api' is in baseURL
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || 'Failed to fetch best seller product');
     }
   }
 );
@@ -94,34 +106,40 @@ export const fetchSimilarProducts = createAsyncThunk(
 const productsSlice = createSlice({
   name: 'products',
   initialState: {
-    products: [],
-    productDetails: null,
-    similarProducts: [],
-    loading: false,
-    error: null,
-    filters: {
-      category: "",
-      size: "",
-      color: "",
-      gender: "",
-      minPrice: null,
-      maxPrice: null,
-      sortBy: "",
-      search: "",
-      material: "",
-      brand: "",
-      collection: ""
-    }
+  products: [],
+  productDetails: null,
+  bestSellerProduct: null,
+  similarProducts: [],
+  loading: false,
+  error: null,
+
+  // ✅ Add this block
+  loadingStates: {
+    bestSeller: false,
   },
+
+  filters: {
+    category: "",
+    size: "",
+    color: "",
+    gender: "",
+    minPrice: null,
+    maxPrice: null,
+    sortBy: "",
+    search: "",
+    material: "",
+    brand: "",
+    collection: "",
+  }
+}
+,
   reducers: {
-    // Set filters dynamically
     setFilters: (state, action) => {
       state.filters = {
         ...state.filters,
         ...action.payload
       };
     },
-    // Clear all filters
     clearFilters: (state) => {
       state.filters = {
         category: "",
@@ -138,9 +156,15 @@ const productsSlice = createSlice({
       };
     }
   },
-
   extraReducers: (builder) => {
     builder
+     .addCase(fetchBestSellerProduct.pending, (state) => {
+  state.loadingStates.bestSeller = true;
+})
+.addCase(fetchBestSellerProduct.fulfilled, (state, action) => {
+  state.loadingStates.bestSeller = false;
+  state.bestSellerProduct = action.payload;
+})
       // fetchProductByFilters
       .addCase(fetchProductByFilters.pending, (state) => {
         state.loading = true;
@@ -152,7 +176,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductByFilters.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // ✅ fixed this
+        state.error = action.payload;
       })
 
       // fetchProductDetails
@@ -194,7 +218,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchSimilarProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.error.message || action.payload || 'Failed to fetch similar products';
       });
   },
 });

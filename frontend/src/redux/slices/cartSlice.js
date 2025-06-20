@@ -17,7 +17,9 @@ export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
   async ({ userId, guestId }, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/api/cart/${userId || guestId}`);
+      const response = await api.get('/api/cart', {
+        params: { userId, guestId } // ✅ FIXED: Use query params, not path
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch cart');
@@ -108,6 +110,7 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Cart
       .addCase(fetchCart.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -122,13 +125,14 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Add to Cart
       .addCase(addToCart.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.products.push(action.payload);
+        state.products = action.payload.products; // ✅ FIXED: update with full cart
         saveCartToStorage(state.products);
       })
       .addCase(addToCart.rejected, (state, action) => {
@@ -136,38 +140,29 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Update Cart Item
       .addCase(updateCartItem.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.products.findIndex(
-          item => item.productId === action.payload.productId &&
-                  item.size === action.payload.size &&
-                  item.color === action.payload.color
-        );
-        if (index !== -1) {
-          state.products[index].quantity = action.payload.quantity;
-          saveCartToStorage(state.products);
-        }
+        state.products = action.payload.products;
+        saveCartToStorage(state.products);
       })
       .addCase(updateCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
+      // Remove from Cart
       .addCase(removeFromCart.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = state.products.filter(
-          item => !(item.productId === action.payload.productId &&
-                    item.size === action.payload.size &&
-                    item.color === action.payload.color)
-        );
+        state.products = action.payload.products;
         saveCartToStorage(state.products);
       })
       .addCase(removeFromCart.rejected, (state, action) => {
@@ -175,6 +170,7 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Merge Guest Cart
       .addCase(mergeCart.pending, (state) => {
         state.loading = true;
         state.error = null;

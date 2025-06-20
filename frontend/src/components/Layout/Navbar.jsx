@@ -10,12 +10,19 @@ import {
 import SearchBar from "../Common/SearchBar";
 import CartDrawer from "./CartDrawer";
 
+import { useSelector } from "react-redux";
+
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
 
+  // ✅ FIXED: Use correct cart state
+  const cart = useSelector((state) => state.cart);
+
+  const cartItemCount =
+    cart?.products?.reduce((total, product) => total + product.quantity, 0) || 0;
+
   useEffect(() => {
-    // Lock scroll when mobile nav drawer is open
     document.body.style.overflow = navDrawerOpen ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
@@ -62,9 +69,13 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link to="/admin" className="block bg-black px-3 py-0.5 rounded text-sm text-white hover:bg-gray-800">
+          <Link
+            to="/admin"
+            className="block bg-black px-3 py-0.5 rounded text-sm text-white hover:bg-gray-800"
+          >
             Admin
           </Link>
+
           <Link to="/profile" className="hover:text-black" aria-label="Login">
             <HiOutlineUser className="h-6 w-6 text-gray-700" />
           </Link>
@@ -77,9 +88,11 @@ const Navbar = () => {
             aria-expanded={drawerOpen}
           >
             <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
-            <span className="absolute -top-1 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-              4
-            </span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                {cartItemCount}
+              </span>
+            )}
           </button>
 
           <div className="overflow-hidden">
@@ -98,8 +111,13 @@ const Navbar = () => {
         </div>
       </nav>
 
-      <CartDrawer cartOpen={drawerOpen} toggleCartDrawer={() => setDrawerOpen(false)} />
+      {/* Cart Drawer */}
+      <CartDrawer
+        cartOpen={drawerOpen}
+        toggleCartDrawer={() => setDrawerOpen(false)}
+      />
 
+      {/* Mobile Navigation */}
       <aside
         className={`fixed top-0 left-0 w-3/4 sm:w-1/2 md:w-1/3 h-full bg-white shadow-lg transform transition-transform duration-300 z-50 ${
           navDrawerOpen ? "translate-x-0" : "-translate-x-full"
@@ -127,28 +145,28 @@ const Navbar = () => {
               Home
             </Link>
             <Link
-              to="/men"
+              to="/collections/all/?gender=Men"
               onClick={() => setNavDrawerOpen(false)}
               className="block text-gray-600 hover:text-black"
             >
               Men
             </Link>
             <Link
-              to="/women"
+              to="/collections/all/?gender=Women"
               onClick={() => setNavDrawerOpen(false)}
               className="block text-gray-600 hover:text-black"
             >
               Women
             </Link>
             <Link
-              to="/top-wear"
+              to="/collections/all/?category=Top Wear"
               onClick={() => setNavDrawerOpen(false)}
               className="block text-gray-600 hover:text-black"
             >
               Top Wear
             </Link>
             <Link
-              to="/bottom-wear"
+              to="/collections/all/?category=Bottom Wear"
               onClick={() => setNavDrawerOpen(false)}
               className="block text-gray-600 hover:text-black"
             >
