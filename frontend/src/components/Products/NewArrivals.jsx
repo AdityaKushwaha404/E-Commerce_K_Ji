@@ -25,7 +25,7 @@ const NewArrivals = () => {
   const fetchNewArrivals = async () => {
     try {
       const response = await axios.get(
-  `${import.meta.env.VITE_BACKEND_URL}/api/products/new-arrivals`
+  `${import.meta.env.VITE_BACKEND_URL}api/products/new-arrivals`
 );
       // console.log("Raw response:", response.data); // Should log an array
       setNewArrivals(response.data || []);
