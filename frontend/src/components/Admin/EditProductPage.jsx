@@ -1,8 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { fetchProductDetails, updateProduct } from "../../redux/slices/productsSlice";
 
 const EditProductPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const { productDetails, loading, error } = useSelector((state) => state.products);
+
   const [productData, setProductData] = useState({
     name: "",
     description: "",
@@ -16,11 +24,26 @@ const EditProductPage = () => {
     collections: "",
     material: "",
     gender: "",
-    images: [
-      { url: "https://picsum.photos/150?random=1" },
-      { url: "https://picsum.photos/150?random=2" },
-    ],
+    images: [],
   });
+
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProductDetails(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (productDetails) {
+      setProductData({
+        ...productDetails,
+        colors: productDetails.colors || [],
+        images: productDetails.images || [],
+      });
+    }
+  }, [productDetails]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,12 +55,29 @@ const EditProductPage = () => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      setUploading(true);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setProductData((prevData) => ({
         ...prevData,
-        images: [...prevData.images, { url: imageUrl }],
+        images: [...prevData.images, { url: data.url, altText: "" }],
       }));
+      setUploading(false);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      setUploading(false);
+      alert("❌ Image upload failed. Please try again.");
     }
   };
 
@@ -50,10 +90,17 @@ const EditProductPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Updated Product Data:", productData);
-    alert("✅ Product updated successfully!");
-    navigate("/admin/products");
+    dispatch(updateProduct({ productId: id, productData }))
+      .unwrap()
+      .then(() => navigate("/admin/products"))
+      .catch((err) => {
+        console.error("Update failed:", err);
+        alert("❌ Failed to update product.");
+      });
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 shadow-md rounded-md bg-white">
@@ -65,7 +112,7 @@ const EditProductPage = () => {
           <input
             type="text"
             name="name"
-            value={productData.name}
+            value={productData.name || ""}
             onChange={handleChange}
             placeholder="Enter product name"
             className="w-full border border-gray-300 rounded-md p-2"
@@ -78,7 +125,7 @@ const EditProductPage = () => {
           <label className="block font-semibold mb-1">Description</label>
           <textarea
             name="description"
-            value={productData.description}
+            value={productData.description || ""}
             onChange={handleChange}
             placeholder="Enter product description"
             className="w-full border border-gray-300 rounded-md p-2"
@@ -94,7 +141,7 @@ const EditProductPage = () => {
             <input
               type="number"
               name="price"
-              value={productData.price}
+              value={productData.price || 0}
               onChange={handleChange}
               placeholder="Enter price"
               className="w-full border border-gray-300 rounded-md p-2"
@@ -106,7 +153,7 @@ const EditProductPage = () => {
             <input
               type="text"
               name="sku"
-              value={productData.sku}
+              value={productData.sku || ""}
               onChange={handleChange}
               placeholder="Enter SKU"
               className="w-full border border-gray-300 rounded-md p-2"
@@ -118,7 +165,7 @@ const EditProductPage = () => {
             <input
               type="number"
               name="countInStock"
-              value={productData.countInStock}
+              value={productData.countInStock || 0}
               onChange={handleChange}
               placeholder="Enter stock quantity"
               className="w-full border border-gray-300 rounded-md p-2"
@@ -133,7 +180,7 @@ const EditProductPage = () => {
           <input
             type="text"
             name="colors"
-            value={productData.colors.join(", ")}
+            value={(productData.colors || []).join(", ")}
             onChange={(e) =>
               setProductData((prev) => ({
                 ...prev,
@@ -143,18 +190,6 @@ const EditProductPage = () => {
             placeholder="e.g. Red, Blue, Green"
             className="w-full border border-gray-300 rounded-md p-2"
           />
-          {productData.colors.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {productData.colors.map((color, index) => (
-                <span
-                  key={index}
-                  className="inline-block w-6 h-6 rounded-full border"
-                  style={{ backgroundColor: color }}
-                  title={color}
-                ></span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Image Upload */}
@@ -169,6 +204,7 @@ const EditProductPage = () => {
               className="hidden"
             />
           </label>
+          {uploading && <span className="ml-2">Uploading...</span>}
           <div className="flex gap-4 mt-4 flex-wrap">
             {productData.images.map((image, index) => (
               <div key={index} className="relative group">

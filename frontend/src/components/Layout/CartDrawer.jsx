@@ -13,14 +13,14 @@ const CartDrawer = ({ cartOpen, toggleCartDrawer }) => {
 
   const userId = user ? user._id : null;
 
-  const handleCheckout = () => {
-    toggleCartDrawer();
-    if (!user) {
-      navigate("/login?redirect=checkout");
-    } else {
-      navigate("/checkout");
-    }
-  };
+ const handleCheckout = () => {
+  toggleCartDrawer();
+  if (!user) {
+    navigate("/login?redirect=/checkout"); // ✅ correct URL
+  } else {
+    navigate("/checkout");
+  }
+};
 
   return (
     <div

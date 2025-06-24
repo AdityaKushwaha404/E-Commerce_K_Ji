@@ -7,17 +7,38 @@ const router = express.Router();
 
 // ✅ Register Route
 router.post("/register", async (req, res) => {
-  const { name, email, password , role} = req.body;
+  const { name, email, password, role } = req.body;
+
+  // 1. ✅ Check if fields are provided
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // 2. ✅ Check email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
+  // 3. ✅ Password length validation
+  if (password.length < 6) {
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 6 characters long" });
+  }
 
   try {
+    // 4. ✅ Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const newUser = new User({ name, email, password ,role});
+    // 5. ✅ Create and save user
+    const newUser = new User({ name, email, password, role });
     await newUser.save();
 
+    // 6. ✅ Create token
     const token = jwt.sign(
       { id: newUser._id },
       process.env.JWT_SECRET || "your_jwt_secret",
@@ -32,16 +53,18 @@ router.post("/register", async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         createdAt: newUser.createdAt,
-updatedAt: newUser.updatedAt
-
+        updatedAt: newUser.updatedAt,
       },
       token,
     });
   } catch (error) {
     console.error("🔥 Registration Error:", error);
-    return res.status(500).json({ message: "Server Error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
   }
 });
+
 
 // ✅ Login Route
 router.post("/login", async (req, res) => {

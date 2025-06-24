@@ -57,7 +57,7 @@ export const deleteProduct = createAsyncThunk(
   'adminProduct/deleteProduct',
   async (productId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api/admin/products/${productId}`, {
+      await api.delete(`/api/products/${productId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },

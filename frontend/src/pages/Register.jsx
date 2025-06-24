@@ -1,26 +1,47 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import register from "../assets/register.webp"; // adjust if needed
-import {registerUser} from "../redux/slices/authSlice"; // Import your register action if needed
-import {useDispatch} from "react-redux"; // Import useDispatch if you want to dispatch
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "../redux/slices/authSlice";
+import { mergeCart } from "../redux/slices/cartSlice";
+import register from "../assets/register.webp";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const dispatch = useDispatch(); // Uncomment if you want to use Redux for registration
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { userInfo, guestId ,loading} = useSelector((state) => state.auth);
+  const { products: cartProducts } = useSelector((state) => state.cart);
+
+  // ✅ Fix redirect with leading slash
+  const redirectParam = new URLSearchParams(location.search).get("redirect");
+  const redirect = redirectParam?.startsWith("/") ? redirectParam : "/";
+  const isCheckoutRedirect = redirect === "/checkout";
+
+  useEffect(() => {
+    if (userInfo) {
+      if (cartProducts?.length > 0 && guestId) {
+        dispatch(mergeCart({ guestId, userId: userInfo._id })).then(() => {
+          navigate(redirect);
+        });
+      } else {
+        navigate(redirect);
+      }
+    }
+  }, [userInfo, cartProducts, guestId, navigate, redirect, dispatch]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(registerUser({ name, email, password })); // Dispatch register action if using Redux
-    
-    // Login logic here
-    console.log({ name ,email, password });
+    await dispatch(registerUser({ name, email, password }));
   };
 
   return (
     <div className="flex border-b border-gray-300 flex-col md:flex-row min-h-[80vh]">
-      {/* Login Form Left */}
+      {/* Left Form Section */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12 bg-gray-50">
         <form
           onSubmit={handleSubmit}
@@ -31,16 +52,16 @@ const Register = () => {
           </div>
 
           <h2 className="text-2xl font-bold text-center mb-6">
-            Hey there! 👋
+            Let's get started 🚀
           </h2>
           <p className="text-center mb-6 text-gray-600">
-            Enter your username and password to Login
+            Create an account to continue
           </p>
 
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">Name</label>
             <input
-              type="name"
+              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -48,6 +69,7 @@ const Register = () => {
               placeholder="Enter your name"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">Email</label>
             <input
@@ -76,23 +98,26 @@ const Register = () => {
             type="submit"
             className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300"
           >
-            Sign Up
+            {loading? "loading..," :"Sign Up"}
           </button>
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Have an account?{" "}
-            <Link to="/login" className="text-blue-500 font-medium underline">
+            <Link
+              to={`/login?redirect=${encodeURIComponent(redirect)}`}
+              className="text-blue-500 font-medium underline"
+            >
               Login
             </Link>
           </p>
         </form>
       </div>
 
-      {/* Right Side Image */}
+      {/* Right Image Section */}
       <div className="hidden md:block md:w-1/2">
         <img
           src={register}
-          alt="Login visual"
+          alt="Register visual"
           className="w-full h-full max-h-[80vh] object-cover"
         />
       </div>

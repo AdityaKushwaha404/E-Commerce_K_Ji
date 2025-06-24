@@ -1,33 +1,42 @@
-import { useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  fetchAllOrders,
+  updateOrderStatus,
+} from "../../redux/slices/adminOrderSlice"; // adjust path as needed
 
-const OrdersTable = () => {
-  const initialOrders = [
-    {
-      _id: "123456",
-      user: { name: "Aditya Kushwaha" },
-      totalPrice: 299.99,
-      status: "Processing",
-    },
-    {
-      _id: "789012",
-      user: { name: "John Doe" },
-      totalPrice: 149.5,
-      status: "Shipped",
-    },
-  ];
+const OrderManagement = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [orderList, setOrderList] = useState(initialOrders);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { orders, loading, error } = useSelector((state) => state.adminOrders);
+
+  useEffect(() => {
+    if (!userInfo || userInfo.role !== "admin") {
+      navigate("/");
+    } else {
+      dispatch(fetchAllOrders());
+    }
+  }, [dispatch, navigate, userInfo]);
 
   const handleStatusChange = (orderId, newStatus) => {
-    const updatedOrders = orderList.map((order) =>
-      order._id === orderId ? { ...order, status: newStatus } : order
-    );
-    setOrderList(updatedOrders);
-    alert(`✅ Order ${orderId} updated to ${newStatus}`);
+    dispatch(updateOrderStatus({ orderId, status: newStatus }));
+
   };
+
+  if (loading) {
+    return <div className="text-center p-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center p-4">Error: {error.message || error}</div>;
+  }
 
   return (
     <div className="overflow-x-auto shadow-md rounded-lg p-4 bg-white">
+      <h2 className="text-xl font-bold mb-4">Order Management</h2>
       <table className="min-w-full text-sm text-left text-gray-700">
         <thead className="bg-gray-100 text-xs uppercase">
           <tr>
@@ -39,14 +48,14 @@ const OrdersTable = () => {
           </tr>
         </thead>
         <tbody>
-          {orderList.length > 0 ? (
-            orderList.map((order) => (
+          {orders?.length > 0 ? (
+            orders.map((order) => (
               <tr key={order._id} className="border-b hover:bg-gray-50">
                 <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
                   #{order._id}
                 </td>
-                <td className="p-4">{order.user.name}</td>
-                <td className="p-4">${order.totalPrice}</td>
+                <td className="p-4">{order.user?.name || "N/A"}</td>
+                <td className="p-4">₹{order.totalPrice.toFixed(2)}</td>
                 <td className="p-4">
                   <select
                     value={order.status}
@@ -88,4 +97,4 @@ const OrdersTable = () => {
   );
 };
 
-export default OrdersTable;
+export default OrderManagement;

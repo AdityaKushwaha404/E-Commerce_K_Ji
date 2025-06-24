@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { MdClose } from "react-icons/md";
 import {
@@ -7,17 +8,16 @@ import {
   HiOutlineShoppingBag,
   HiBars3BottomRight,
 } from "react-icons/hi2";
+
 import SearchBar from "../Common/SearchBar";
 import CartDrawer from "./CartDrawer";
-
-import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
 
-  // ✅ FIXED: Use correct cart state
   const cart = useSelector((state) => state.cart);
+  const { userInfo } = useSelector((state) => state.auth); // ✅ FIXED
 
   const cartItemCount =
     cart?.products?.reduce((total, product) => total + product.quantity, 0) || 0;
@@ -69,12 +69,15 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link
-            to="/admin"
-            className="block bg-black px-3 py-0.5 rounded text-sm text-white hover:bg-gray-800"
-          >
-            Admin
-          </Link>
+          {/* ✅ ADMIN button */}
+          {userInfo && userInfo.role === "admin" && (
+            <Link
+              to="/admin"
+              className="block bg-black px-3 py-0.5 rounded text-sm text-white hover:bg-gray-800"
+            >
+              Admin
+            </Link>
+          )}
 
           <Link to="/profile" className="hover:text-black" aria-label="Login">
             <HiOutlineUser className="h-6 w-6 text-gray-700" />

@@ -1,8 +1,28 @@
-import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { clearCart } from "../redux/slices/cartSlice";
 
 const OrderConfirmationPage = () => {
-  const location = useLocation();
-  const checkout = location.state?.checkout;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { checkout } = useSelector((state) => state.checkout); // Assuming `checkout` slice contains checkout data
+
+  useEffect(() => {
+    if (checkout && checkout._id) {
+      dispatch(clearCart());
+      localStorage.removeItem("cart");
+    } else {
+      navigate("/my-orders");
+    }
+  }, [checkout, dispatch, navigate]);
+
+  const calculateEstimatedDelivery = (createdAt) => {
+    const orderDate = new Date(createdAt);
+    orderDate.setDate(orderDate.getDate() + 10); // Add 10 days
+    return orderDate.toLocaleDateString();
+  };
 
   if (!checkout) {
     return (
@@ -27,14 +47,19 @@ const OrderConfirmationPage = () => {
             <p className="text-sm text-gray-500">
               Ordered on: {new Date(checkout.createdAt).toLocaleDateString()}
             </p>
+            <p className="text-sm text-gray-500">
+              Estimated delivery: {calculateEstimatedDelivery(checkout.createdAt)}
+            </p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-semibold">Total: ${checkout.total}</p>
+            <p className="text-lg font-semibold">
+              Total: ${Number(checkout.total).toFixed(2)}
+            </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          {checkout.checkoutItems.map((item, index) => (
+          {checkout.checkoutItems?.map((item, index) => (
             <div key={index} className="flex items-center border-b pb-4">
               <img
                 src={item.image}
@@ -48,7 +73,7 @@ const OrderConfirmationPage = () => {
                 </p>
               </div>
               <div className="ml-auto text-right">
-                <p className="text-md">${item.price}</p>
+                <p className="text-md">${Number(item.price).toFixed(2)}</p>
                 <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
               </div>
             </div>

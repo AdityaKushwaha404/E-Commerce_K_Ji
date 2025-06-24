@@ -1,10 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/axios'; // ✅ use custom axios instance
-// import axios from 'axios';
 
-const userFromStorage = localStorage.getItem('userInfo')
-  ? JSON.parse(localStorage.getItem('userInfo'))
-  : null;
+// ✅ Safe parsing of userInfo from localStorage
+let userFromStorage = null;
+try {
+  const stored = localStorage.getItem("userInfo");
+  if (stored && stored !== "undefined") {
+    userFromStorage = JSON.parse(stored);
+  }
+} catch (e) {
+  console.error("❌ Failed to parse userInfo from localStorage:", e);
+  localStorage.removeItem("userInfo");
+}
 
 const initialGuestId = localStorage.getItem('guestId') || `guest_${Date.now()}`;
 localStorage.setItem('guestId', initialGuestId);
@@ -34,7 +41,6 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
-
 
 // ✅ Register
 export const registerUser = createAsyncThunk(

@@ -28,11 +28,10 @@ router.post("/", async (req, res) => {
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     let cart = await getCart(userId, guestId);
-
     if (!cart) {
       cart = await Cart.create({
         userId: userId || undefined,
-        guestId: guestId || "guest_" + Date.now(),
+        guestId: guestId || `guest_${Date.now()}`,
         products: [],
         totalPrice: 0,
       });
@@ -65,7 +64,10 @@ router.post("/", async (req, res) => {
     );
 
     await cart.save();
-    return res.status(200).json(cart);
+    return res.status(200).json({
+      products: cart.products,
+      totalPrice: cart.totalPrice,
+    });
   } catch (error) {
     console.error("🔥 Error adding to cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -105,7 +107,10 @@ router.put("/", async (req, res) => {
     );
 
     await cart.save();
-    return res.status(200).json(cart);
+    return res.status(200).json({
+      products: cart.products,
+      totalPrice: cart.totalPrice,
+    });
   } catch (error) {
     console.error("🔥 Error updating cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -140,7 +145,10 @@ router.delete("/", async (req, res) => {
     );
 
     await cart.save();
-    return res.status(200).json(cart);
+    return res.status(200).json({
+      products: cart.products,
+      totalPrice: cart.totalPrice,
+    });
   } catch (error) {
     console.error("🔥 Error removing from cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -155,9 +163,10 @@ router.get("/", async (req, res) => {
 
   try {
     const cart = await getCart(userId, guestId);
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-    return res.status(200).json(cart);
+    return res.status(200).json({
+      products: cart?.products || [],
+      totalPrice: cart?.totalPrice || 0,
+    });
   } catch (error) {
     console.error("🔥 Error fetching cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -175,23 +184,39 @@ router.post("/merge", protect, async (req, res) => {
 
   try {
     const guestCart = await Cart.findOne({ guestId });
-    if (!guestCart) return res.status(404).json({ message: "Guest cart not found" });
-
     let userCart = await Cart.findOne({ userId });
+
+    if (!guestCart) {
+      return res.status(200).json({
+        message: "No guest cart to merge",
+        products: userCart?.products || [],
+        totalPrice: userCart?.totalPrice || 0,
+        userId: req.user._id,
+        user: {
+          id: req.user._id,
+          name: req.user.name,
+          email: req.user.email,
+          role: req.user.role,
+          createdAt: req.user.createdAt,
+          updatedAt: req.user.updatedAt,
+        },
+      });
+    }
+
     if (!userCart) {
       userCart = new Cart({ userId, products: [], totalPrice: 0 });
     }
 
     guestCart.products.forEach((item) => {
-      const existingIndex = userCart.products.findIndex(
+      const index = userCart.products.findIndex(
         (p) =>
           p.productId.toString() === item.productId.toString() &&
           p.size === item.size &&
           p.color === item.color
       );
 
-      if (existingIndex > -1) {
-        userCart.products[existingIndex].quantity += item.quantity;
+      if (index > -1) {
+        userCart.products[index].quantity += item.quantity;
       } else {
         userCart.products.push(item);
       }
@@ -205,7 +230,20 @@ router.post("/merge", protect, async (req, res) => {
     await userCart.save();
     await Cart.deleteOne({ _id: guestCart._id });
 
-    res.status(200).json(userCart);
+    return res.status(200).json({
+      message: "Cart merged successfully",
+      products: userCart.products,
+      totalPrice: userCart.totalPrice,
+      userId: req.user._id,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+        createdAt: req.user.createdAt,
+        updatedAt: req.user.updatedAt,
+      },
+    });
   } catch (error) {
     console.error("🔥 Error merging cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });

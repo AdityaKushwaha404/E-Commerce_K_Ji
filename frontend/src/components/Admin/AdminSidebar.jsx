@@ -1,4 +1,8 @@
 import { NavLink, Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
+import { clearCart } from "../../redux/slices/cartSlice";
+
 import {
   FaSignOutAlt,
   FaUsers,
@@ -10,8 +14,11 @@ import {
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
+    dispatch(logout()); // Assuming you have a logoutUser action
+    dispatch(clearCart()); // Clear the cart if needed
     // Add any logout logic if needed (like clearing tokens)
     navigate("/");
   };

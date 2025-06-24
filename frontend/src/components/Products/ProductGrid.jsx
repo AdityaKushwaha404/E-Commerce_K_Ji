@@ -36,7 +36,7 @@ const ProductGrid = ({ products,loading,error }) => {
 
           <div className="flex items-baseline space-x-2">
             <span className="text-lg font-bold text-black">₹{product.price}</span>
-            <span className="line-through text-gray-400 text-sm">₹{product.originalPrice}</span>
+            <span className="line-through text-gray-400 text-sm">₹{(product.price + 50).toFixed(2)}</span>
           </div>
           </Link>
         </div>

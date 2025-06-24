@@ -128,7 +128,7 @@ const ProductDetails = ({ productId }) => {
             <p className="text-gray-700 mb-4">{productDetails.description}</p>
             <div className="text-lg mb-2">
               <span className="text-red-600 font-semibold mr-2">₹{productDetails.price}</span>
-              <span className="line-through text-gray-500">₹{productDetails.originalPrice}</span>
+              <span className="line-through text-gray-500">₹{(productDetails.price + 50).toFixed(2)}</span>
             </div>
 
             <div className="mb-4">

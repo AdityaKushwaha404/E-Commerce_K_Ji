@@ -1,54 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { fetchUserOrders } from "../redux/slices/orderSlice"; // ✅ adjust path as needed
 
 const MyOrdersPage = () => {
-  const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { orders, loading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          _id: "12345",
-          createdAt: new Date(),
-          shippingAddress: { city: "New York", country: "USA" },
-          orderItems: [
-            {
-              name: "Product 1",
-              image: "https://picsum.photos/500/500?random=1",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "67890",
-          createdAt: new Date(),
-          shippingAddress: { city: "London", country: "UK" },
-          orderItems: [
-            {
-              name: "Product 2",
-              image: "https://picsum.photos/500/500?random=2",
-            },
-          ],
-          totalPrice: 150,
-          isPaid: false,
-        },
-        {
-          _id: "54321",
-          createdAt: new Date(),
-          shippingAddress: { city: "Delhi", country: "India" },
-          orderItems: [
-            {
-              name: "Product 3",
-              image: "https://picsum.photos/500/500?random=3",
-            },
-          ],
-          totalPrice: 80,
-          isPaid: true,
-        },
-      ];
-      setOrders(mockOrders);
-    }, 1000);
-  }, []);
+    dispatch(fetchUserOrders());
+  }, [dispatch]);
+
+  const handleOrderClick = (orderId) => {
+    navigate(`/order/${orderId}`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -68,16 +34,17 @@ const MyOrdersPage = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.length > 0 ? (
+            {orders?.length > 0 ? (
               orders.map((order) => (
                 <tr
                   key={order._id}
                   className="border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleOrderClick(order._id)}
                 >
                   <td className="py-2 px-2 sm:py-4 sm:px-4">
                     <img
-                      src={order.orderItems[0].image}
-                      alt={order.orderItems[0].name}
+                      src={order.orderItems[0]?.image}
+                      alt={order.orderItems[0]?.name}
                       className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
                     />
                   </td>
@@ -91,7 +58,7 @@ const MyOrdersPage = () => {
                     {order.shippingAddress.city}, {order.shippingAddress.country}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    {order.orderItems[0].name}
+                    {order.orderItems.map(item => item.name).join(", ")}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4">
                     ₹{order.totalPrice}
@@ -112,7 +79,7 @@ const MyOrdersPage = () => {
             ) : (
               <tr>
                 <td colSpan={7} className="py-4 px-4 text-center text-gray-500">
-                  You have no orders.
+                  {loading ? "Loading orders..." : error ? error : "You have no orders."}
                 </td>
               </tr>
             )}

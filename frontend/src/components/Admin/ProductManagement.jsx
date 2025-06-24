@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchAdminProducts,
+  deleteProduct,
+} from "../../redux/slices/adminProductSlice";
 
 const ProductManagement = () => {
-  const [products, setProducts] = useState([
-    {
-      _id: 123123,
-      name: "Shirt",
-      price: 110,
-      sku: "123123213",
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { products, loading, error } = useSelector(
+    (state) => state.adminProducts
+  );
+
+  // Fetch products on component mount
+  useEffect(() => {
+    dispatch(fetchAdminProducts());
+  }, [dispatch]);
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts((prev) => prev.filter((p) => p._id !== id));
-      alert(`🗑️ Product with ID ${id} deleted`);
+      dispatch(deleteProduct(id)).then(() => {
+        dispatch(fetchAdminProducts()); // Refresh the product list
+      });
     }
   };
+
+  if (loading) {
+    return <div className="text-center p-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center p-4">Error: {error}</div>;
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -33,14 +48,14 @@ const ProductManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {products.length > 0 ? (
+            {products?.length > 0 ? (
               products.map((product) => (
                 <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-4 font-medium text-gray-900 whitespace-nowrap">
                     {product.name}
                   </td>
-                  <td className="p-4">${product.price}</td>
-                  <td className="p-4">{product.sku}</td>
+                  <td className="p-4">₹{product.price}</td>
+                  <td className="p-4">{product.sku || "N/A"}</td>
                   <td className="p-4">
                     <Link
                       to={`/admin/products/${product._id}/edit`}
