@@ -5,14 +5,15 @@ import womensCollectionImage from "../../assets/womens-collection.webp";
 
 const GenderCollectionSection = () => {
   return (
-    <section className="py-16 px-4 lg:px-0 bg-gray-50">
-      <div className="container mx-auto flex flex-col md:flex-row gap-10">
+    <section className="py-16 px-4 mx-8
+     lg:px-0">
+      <div className="container mx-auto flex flex-col md:flex-row gap-25 "  >
         {/* Women's Collection */}
         <div className="relative flex-1 group overflow-hidden rounded-xl shadow-lg cursor-pointer">
           <img
-            src={womensCollectionImage}
+            src="https://i.pinimg.com/736x/51/50/93/515093863366ca3989c5f40172bdc996.jpg"
             alt="Women's Collection"
-            className="w-full h-[700px] md:h-[600px] object-cover transform transition-transform duration-500 group-hover:scale-101"
+            className="w-full h-[700px] md:h-[800px] object-cover transform transition-transform duration-500 group-hover:scale-101"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -33,9 +34,9 @@ const GenderCollectionSection = () => {
         {/* Men's Collection */}
         <div className="relative flex-1 group overflow-hidden rounded-xl shadow-lg cursor-pointer">
           <img
-            src={mensCollectionImage}
+            src="https://i.pinimg.com/736x/c2/a3/0c/c2a30ca1c6039442c07509ff65a8d0af.jpg"
             alt="Men's Collection"
-            className="w-full h-[700px] md:h-[600px] object-cover transform transition-transform duration-500 group-hover:scale-101"
+            className="w-full h-[700px] md:h-[800px] object-cover transform transition-transform duration-500 group-hover:scale-101"
           />
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
