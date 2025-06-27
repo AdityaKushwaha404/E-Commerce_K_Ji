@@ -59,7 +59,8 @@ A powerful and complete eCommerce platform built with the **MERN stack** (MongoD
 
 ## 🌐 Live Demo
 
-🔗 [**Check it out on Vercel**]([https://your-project-link.vercel.app](https://e-commerce-k-ji-q8g6.vercel.app/))  
+🔗 🔗 [**Check it out on Vercel**](https://e-commerce-k-ji-q8g6.vercel.app/)
+
 💬 I’d love your feedback — feel free to suggest improvements or report bugs!
 
 ---
