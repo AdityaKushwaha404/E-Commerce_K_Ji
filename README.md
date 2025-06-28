@@ -71,13 +71,6 @@ A powerful and complete eCommerce platform built with the **MERN stack** (MongoD
 
 ---
 
-## 📸 Screenshots
-
-> *(Add project screenshots or GIFs here)*  
-> Product listing • Cart drawer • Checkout • Admin dashboard • Mobile view
-
----
-
 ## 🙌 Feedback & Contributions
 
 Your feedback helps improve the project!  
